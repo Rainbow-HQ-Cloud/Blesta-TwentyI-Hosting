@@ -1,0 +1,40 @@
+<?php
+/**
+ * @var $module object  The module object
+ */
+?>
+<div class="tab-content">
+    <div class="tab-pane fade show active">
+        <?php if (empty($module->rows)) : ?>
+            <p class="text-muted"><?php echo $this->Html->_("No 20i accounts have been added yet."); ?></p>
+        <?php else : ?>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><?php $this->Html->_("TwentyiHosting.row_fields.account_label", true); ?></th>
+                        <th><?php $this->Html->_("Options"); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($module->rows as $row) : ?>
+                        <tr>
+                            <td><?php echo $this->Html->_(isset($row->meta->account_label) ? $row->meta->account_label : '—'); ?></td>
+                            <td>
+                                <a href="<?php echo $this->Html->safe($this->base_uri . 'settings/company/modules/editrow/' . $module->id . '/' . $row->id . '/'); ?>" class="btn btn-sm btn-secondary">
+                                    <?php $this->Html->_("Edit"); ?>
+                                </a>
+                                <a href="<?php echo $this->Html->safe($this->base_uri . 'settings/company/modules/deleterow/' . $module->id . '/' . $row->id . '/'); ?>" class="btn btn-sm btn-danger">
+                                    <?php $this->Html->_("Delete"); ?>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <a href="<?php echo $this->Html->safe($this->base_uri . 'settings/company/modules/addrow/' . $module->id . '/'); ?>" class="btn btn-primary">
+            <?php $this->Html->_("TwentyiHosting.row_fields.add_btn", true); ?>
+        </a>
+    </div>
+</div>

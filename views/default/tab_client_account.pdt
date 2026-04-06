@@ -1,0 +1,90 @@
+<?php
+/**
+ * Client: Account Overview tab
+ *
+ * @var $fields      object
+ * @var $packageData object|null
+ * @var $sslData     object|null
+ * @var $apiError    string|null
+ * @var $no_package_id bool|null
+ */
+?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-info">
+        <?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?>
+    </div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($apiError)) : ?>
+    <div class="alert alert-warning"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0"><?php $this->Html->_("TwentyiHosting.tab_client_account", true); ?></h5>
+    <!-- SSO via POST to prevent browser caching the token URL -->
+    <?php $this->Form->create(); ?>
+    <input type="hidden" name="action" value="sso">
+    <button type="submit" class="btn btn-primary btn-sm">
+        <?php $this->Html->_("TwentyiHosting.tab_account.sso_btn", true); ?>
+    </button>
+    <?php $this->Form->end(); ?>
+</div>
+
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.domain", true); ?></th>
+            <td><?php echo $this->Html->safe($fields->twentyi_domain ?? '—'); ?></td>
+        </tr>
+        <?php if ($packageData !== null) : ?>
+            <tr>
+                <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.status", true); ?></th>
+                <td>
+                    <?php
+                    $enabled = $packageData->enabled ?? $packageData->status ?? null;
+                    if ($enabled === true || $enabled === 'active') {
+                        echo '<span class="badge bg-success">Active</span>';
+                    } elseif ($enabled === false || $enabled === 'suspended') {
+                        echo '<span class="badge bg-warning text-dark">Suspended</span>';
+                    }
+                    ?>
+                </td>
+            </tr>
+            <?php if (!empty($packageData->diskUsage)) : ?>
+                <tr>
+                    <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.disk_usage", true); ?></th>
+                    <td><?php echo $this->Html->safe((string) $packageData->diskUsage); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if (!empty($packageData->bandwidthUsage)) : ?>
+                <tr>
+                    <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.bandwidth_usage", true); ?></th>
+                    <td><?php echo $this->Html->safe((string) $packageData->bandwidthUsage); ?></td>
+                </tr>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if ($sslData !== null) : ?>
+            <tr>
+                <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.ssl_status", true); ?></th>
+                <td>
+                    <?php
+                    $sslStatus = $sslData->status ?? null;
+                    if ($sslStatus === 'valid' || $sslStatus === 'active') {
+                        echo '<span class="badge bg-success">' . $this->Html->_('TwentyiHosting.tab_account.ssl_valid', true) . '</span>';
+                    } elseif ($sslStatus === 'pending') {
+                        echo '<span class="badge bg-info">' . $this->Html->_('TwentyiHosting.tab_account.ssl_pending', true) . '</span>';
+                    } elseif ($sslStatus !== null) {
+                        echo '<span class="badge bg-danger">' . $this->Html->_('TwentyiHosting.tab_account.ssl_invalid', true) . '</span>';
+                    }
+                    if (!empty($sslData->expiry)) {
+                        echo ' <small class="text-muted">' . $this->Html->_('TwentyiHosting.tab_account.ssl_expiry', true) . ': ' . $this->Html->safe($sslData->expiry) . '</small>';
+                    }
+                    ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>

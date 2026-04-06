@@ -1,0 +1,79 @@
+<?php
+/**
+ * Admin/Client: FTP Management tab
+ *
+ * @var $fields     object
+ * @var $ftpStatus  object|null
+ * @var $post       array
+ * @var $notice     string|null
+ * @var $apiError   string|null
+ * @var $no_package_id bool|null
+ */
+?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-warning"><?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($notice)) : ?>
+    <div class="alert alert-success"><?php echo $this->Html->safe($notice); ?></div>
+<?php endif; ?>
+
+<?php if (!empty($apiError)) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<h5><?php $this->Html->_("TwentyiHosting.tab_ftp.title", true); ?></h5>
+
+<!-- FTP Lock status + toggle -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <strong><?php $this->Html->_("TwentyiHosting.tab_ftp.lock_status", true); ?>:</strong>
+                <?php
+                $locked = $ftpStatus->locked ?? null;
+                if ($locked === true) {
+                    echo ' <span class="badge bg-danger">' . $this->Html->_('TwentyiHosting.tab_ftp.locked', true) . '</span>';
+                } elseif ($locked === false) {
+                    echo ' <span class="badge bg-success">' . $this->Html->_('TwentyiHosting.tab_ftp.unlocked', true) . '</span>';
+                } else {
+                    echo ' <span class="badge bg-secondary">Unknown</span>';
+                }
+                ?>
+            </div>
+            <?php $this->Form->create(); ?>
+            <input type="hidden" name="action" value="ftp_lock">
+            <input type="hidden" name="locked" value="<?php echo $locked ? '0' : '1'; ?>">
+            <button type="submit" class="btn btn-sm <?php echo $locked ? 'btn-success' : 'btn-warning'; ?>">
+                <?php $this->Html->_($locked ? 'TwentyiHosting.tab_ftp.enable_btn' : 'TwentyiHosting.tab_ftp.disable_btn', true); ?>
+            </button>
+            <?php $this->Form->end(); ?>
+        </div>
+    </div>
+</div>
+
+<!-- Reset FTP password -->
+<hr>
+<h6><?php $this->Html->_("TwentyiHosting.tab_ftp.reset_password", true); ?></h6>
+<?php $this->Form->create(); ?>
+<input type="hidden" name="action" value="reset_password">
+<div class="row g-2 align-items-end">
+    <div class="col-sm-4">
+        <label class="form-label" for="ftp_password">
+            <?php $this->Html->_("TwentyiHosting.tab_ftp.new_password", true); ?>
+        </label>
+        <input type="password"
+               class="form-control form-control-sm"
+               id="ftp_password"
+               name="ftp_password"
+               autocomplete="new-password">
+    </div>
+    <div class="col-sm-2">
+        <button type="submit" class="btn btn-sm btn-primary">
+            <?php $this->Html->_("TwentyiHosting.tab_ftp.reset_btn", true); ?>
+        </button>
+    </div>
+</div>
+<?php $this->Form->end(); ?>

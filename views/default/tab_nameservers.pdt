@@ -1,0 +1,62 @@
+<?php
+/**
+ * Admin/Client: Nameservers tab
+ *
+ * @var $fields       object
+ * @var $nameservers  array
+ * @var $post         array
+ * @var $notice       string|null
+ * @var $apiError     string|null
+ * @var $no_package_id  bool|null
+ * @var $not_applicable bool|null
+ */
+?>
+
+<?php if (!empty($not_applicable)) : ?>
+    <div class="alert alert-info"><?php $this->Html->_("TwentyiHosting.tab_nameservers.not_applicable", true); ?></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-warning"><?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($notice)) : ?>
+    <div class="alert alert-success"><?php echo $this->Html->safe($notice); ?></div>
+<?php endif; ?>
+
+<?php if (!empty($apiError)) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<h5><?php $this->Html->_("TwentyiHosting.tab_nameservers.title", true); ?></h5>
+<p class="text-muted"><?php $this->Html->_("TwentyiHosting.tab_nameservers.description", true); ?></p>
+
+<?php $this->Form->create(); ?>
+<input type="hidden" name="action" value="update_nameservers">
+<div class="row g-3" style="max-width:500px;">
+    <?php for ($i = 1; $i <= 4; $i++) :
+        $current = $nameservers[$i - 1] ?? ($post["ns{$i}"] ?? '');
+        $required = $i <= 2 ? ' *' : ' (optional)';
+    ?>
+        <div class="col-12">
+            <label class="form-label" for="ns<?php echo $i; ?>">
+                <?php $this->Html->_("TwentyiHosting.tab_nameservers.ns{$i}", true); ?>
+            </label>
+            <input type="text"
+                   class="form-control form-control-sm"
+                   id="ns<?php echo $i; ?>"
+                   name="ns<?php echo $i; ?>"
+                   value="<?php echo $this->Html->safe($current); ?>"
+                   placeholder="ns<?php echo $i; ?>.example.com">
+        </div>
+    <?php endfor; ?>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary btn-sm">
+            <?php $this->Html->_("TwentyiHosting.tab_nameservers.save_btn", true); ?>
+        </button>
+    </div>
+</div>
+<?php $this->Form->end(); ?>

@@ -1,0 +1,29 @@
+{
+    "version": "1.0.0",
+    "name": "TwentyiHosting.name",
+    "description": "TwentyiHosting.description",
+    "authors": [
+        {
+            "name": "Rainbow HQ",
+            "url": "https://github.com/Rainbow-HQ-Cloud/Blesta-TwentyI-Hosting"
+        }
+    ],
+    "type": "server",
+    "package": {
+        "name_key": "twentyi_domain"
+    },
+    "service": {
+        "name_key": "twentyi_domain"
+    },
+    "module": {
+        "row": "TwentyiHosting.module_row",
+        "rows": "TwentyiHosting.module_row_plural",
+        "row_key": "account_label",
+        "group": "TwentyiHosting.module_group"
+    },
+    "email_tags": {
+        "module": ["account_label"],
+        "package": ["twentyi_package_type"],
+        "service": ["twentyi_domain", "twentyi_package_id", "twentyi_username"]
+    }
+}

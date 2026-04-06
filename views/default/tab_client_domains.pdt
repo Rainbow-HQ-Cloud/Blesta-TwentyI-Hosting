@@ -1,0 +1,85 @@
+<?php
+/**
+ * Admin/Client: Addon Domains tab
+ *
+ * @var $fields    object
+ * @var $domains   array
+ * @var $post      array
+ * @var $notice    string|null
+ * @var $apiError  string|null
+ * @var $no_package_id bool|null
+ */
+?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-warning"><?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($notice)) : ?>
+    <div class="alert alert-success"><?php echo $this->Html->safe($notice); ?></div>
+<?php endif; ?>
+
+<?php if (!empty($apiError)) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<h5><?php $this->Html->_("TwentyiHosting.tab_domains.title", true); ?></h5>
+
+<?php if (empty($domains)) : ?>
+    <p class="text-muted"><?php $this->Html->_("TwentyiHosting.tab_domains.no_domains", true); ?></p>
+<?php else : ?>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th><?php $this->Html->_("TwentyiHosting.tab_domains.domain", true); ?></th>
+                <th><?php $this->Html->_("TwentyiHosting.tab_domains.actions", true); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($domains as $addonDomain) :
+                $domainName = is_string($addonDomain) ? $addonDomain : ($addonDomain->name ?? (string) $addonDomain);
+                // Skip the primary domain
+                if ($domainName === ($fields->twentyi_domain ?? '')) continue;
+            ?>
+                <tr>
+                    <td><?php echo $this->Html->safe($domainName); ?></td>
+                    <td>
+                        <?php $this->Form->create(); ?>
+                        <input type="hidden" name="action" value="remove_domain">
+                        <input type="hidden" name="addon_domain" value="<?php echo $this->Html->safe($domainName); ?>">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Remove <?php echo $this->Html->safe($domainName); ?> from this package?');">
+                            <?php $this->Html->_("TwentyiHosting.tab_domains.delete_btn", true); ?>
+                        </button>
+                        <?php $this->Form->end(); ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+
+<hr>
+<h6><?php $this->Html->_("TwentyiHosting.tab_domains.add_domain", true); ?></h6>
+<?php $this->Form->create(); ?>
+<input type="hidden" name="action" value="add_domain">
+<div class="row g-2 align-items-end">
+    <div class="col-sm-5">
+        <label class="form-label" for="addon_domain">
+            <?php $this->Html->_("TwentyiHosting.tab_domains.domain", true); ?>
+        </label>
+        <input type="text"
+               class="form-control form-control-sm"
+               id="addon_domain"
+               name="addon_domain"
+               value="<?php echo $this->Html->safe($post['addon_domain'] ?? ''); ?>"
+               placeholder="another-domain.com">
+    </div>
+    <div class="col-sm-2">
+        <button type="submit" class="btn btn-sm btn-primary">
+            <?php $this->Html->_("TwentyiHosting.tab_domains.add_btn", true); ?>
+        </button>
+    </div>
+</div>
+<?php $this->Form->end(); ?>

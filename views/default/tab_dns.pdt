@@ -1,0 +1,107 @@
+<?php
+/**
+ * Admin/Client: DNS Management tab
+ *
+ * @var $fields    object
+ * @var $records   array
+ * @var $post      array
+ * @var $notice    string|null
+ * @var $apiError  string|null
+ * @var $no_package_id bool|null
+ */
+?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-warning"><?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($notice)) : ?>
+    <div class="alert alert-success"><?php echo $this->Html->safe($notice); ?></div>
+<?php endif; ?>
+
+<?php if (!empty($apiError)) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<!-- Existing records -->
+<h5><?php $this->Html->_("TwentyiHosting.tab_dns.title", true); ?></h5>
+<?php if (empty($records)) : ?>
+    <p class="text-muted"><?php $this->Html->_("TwentyiHosting.tab_dns.no_records", true); ?></p>
+<?php else : ?>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th><?php $this->Html->_("TwentyiHosting.tab_dns.type", true); ?></th>
+                <th><?php $this->Html->_("TwentyiHosting.tab_dns.host", true); ?></th>
+                <th><?php $this->Html->_("TwentyiHosting.tab_dns.data", true); ?></th>
+                <th><?php $this->Html->_("TwentyiHosting.tab_dns.ttl", true); ?></th>
+                <th><?php $this->Html->_("TwentyiHosting.tab_dns.actions", true); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($records as $record) : ?>
+                <tr>
+                    <td><code><?php echo $this->Html->safe($record->type ?? ''); ?></code></td>
+                    <td><?php echo $this->Html->safe($record->host ?? $record->name ?? ''); ?></td>
+                    <td><?php echo $this->Html->safe($record->data ?? $record->value ?? ''); ?></td>
+                    <td><?php echo $this->Html->safe((string) ($record->ttl ?? '')); ?></td>
+                    <td>
+                        <?php $this->Form->create(); ?>
+                        <input type="hidden" name="action" value="delete_record">
+                        <input type="hidden" name="record_id" value="<?php echo $this->Html->safe($record->id ?? ''); ?>">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this DNS record?');">
+                            <?php $this->Html->_("TwentyiHosting.tab_dns.delete_btn", true); ?>
+                        </button>
+                        <?php $this->Form->end(); ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+
+<!-- Add record form -->
+<hr>
+<h6><?php $this->Html->_("TwentyiHosting.tab_dns.add_record", true); ?></h6>
+<?php $this->Form->create(); ?>
+<input type="hidden" name="action" value="add_record">
+<div class="row g-2 align-items-end">
+    <div class="col-sm-2">
+        <label class="form-label" for="dns_type"><?php $this->Html->_("TwentyiHosting.tab_dns.type", true); ?></label>
+        <select name="type" id="dns_type" class="form-select form-select-sm">
+            <?php foreach (['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA'] as $t) : ?>
+                <option value="<?php echo $t; ?>"<?php echo (($post['type'] ?? '') === $t) ? ' selected' : ''; ?>><?php echo $t; ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label" for="dns_host"><?php $this->Html->_("TwentyiHosting.tab_dns.host", true); ?></label>
+        <input type="text" class="form-control form-control-sm" id="dns_host" name="host"
+               value="<?php echo $this->Html->safe($post['host'] ?? ''); ?>"
+               placeholder="@ or subdomain">
+    </div>
+    <div class="col-sm-4">
+        <label class="form-label" for="dns_data"><?php $this->Html->_("TwentyiHosting.tab_dns.data", true); ?></label>
+        <input type="text" class="form-control form-control-sm" id="dns_data" name="data"
+               value="<?php echo $this->Html->safe($post['data'] ?? ''); ?>"
+               placeholder="1.2.3.4 or target.example.com">
+    </div>
+    <div class="col-sm-1">
+        <label class="form-label" for="dns_ttl"><?php $this->Html->_("TwentyiHosting.tab_dns.ttl", true); ?></label>
+        <input type="number" class="form-control form-control-sm" id="dns_ttl" name="ttl"
+               value="<?php echo $this->Html->safe($post['ttl'] ?? '3600'); ?>" min="300">
+    </div>
+    <div class="col-sm-1">
+        <label class="form-label" for="dns_priority"><?php $this->Html->_("TwentyiHosting.tab_dns.priority", true); ?></label>
+        <input type="number" class="form-control form-control-sm" id="dns_priority" name="priority"
+               value="<?php echo $this->Html->safe($post['priority'] ?? ''); ?>" placeholder="10">
+    </div>
+    <div class="col-sm-1">
+        <button type="submit" class="btn btn-sm btn-primary w-100">
+            <?php $this->Html->_("TwentyiHosting.tab_dns.add_btn", true); ?>
+        </button>
+    </div>
+</div>
+<?php $this->Form->end(); ?>

@@ -1,0 +1,18 @@
+<?php
+/**
+ * Admin: Raw API Info tab
+ *
+ * @var $rawData  string|null  JSON-encoded package data
+ * @var $apiError string|null
+ */
+?>
+
+<?php if ($apiError !== null) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<?php if ($rawData !== null) : ?>
+    <pre class="bg-light border rounded p-3" style="max-height:600px;overflow:auto;font-size:0.8rem;"><?php echo $this->Html->safe($rawData); ?></pre>
+<?php else : ?>
+    <p class="text-muted">No data available.</p>
+<?php endif; ?>

@@ -1,0 +1,42 @@
+<?php
+/**
+ * @var $vars object  Form variables (pre-populated with existing row meta)
+ */
+?>
+<?php $this->Form->create(); ?>
+<div class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label" for="account_label">
+            <?php $this->Html->_("TwentyiHosting.row_fields.account_label", true); ?>
+            <span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               class="form-control"
+               id="account_label"
+               name="account_label"
+               value="<?php echo $this->Html->safe($vars->account_label ?? ''); ?>">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label" for="api_key">
+            <?php $this->Html->_("TwentyiHosting.row_fields.api_key", true); ?>
+            <span class="text-danger">*</span>
+        </label>
+        <input type="password"
+               class="form-control"
+               id="api_key"
+               name="api_key"
+               value="<?php echo $this->Html->safe($vars->api_key ?? ''); ?>"
+               autocomplete="new-password">
+        <div class="form-text text-muted">
+            <?php $this->Html->_("TwentyiHosting.row_fields.api_key_note", true); ?>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <button type="submit" class="btn btn-primary">
+        <?php $this->Html->_("TwentyiHosting.row_fields.edit_btn", true); ?>
+    </button>
+</div>
+<?php $this->Form->end(); ?>

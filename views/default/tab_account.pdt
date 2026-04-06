@@ -1,0 +1,113 @@
+<?php
+/**
+ * Admin: Account Overview tab
+ *
+ * @var $fields      object   Service fields (twentyi_domain, twentyi_package_id, etc.)
+ * @var $packageData object|null  Live data from 20i
+ * @var $sslData     object|null  SSL status from 20i
+ * @var $ssoUrl      string|null  SSO URL
+ * @var $apiError    string|null
+ * @var $no_package_id bool|null
+ */
+?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-warning">
+        <?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?>
+    </div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if ($apiError !== null) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0"><?php $this->Html->_("TwentyiHosting.tab_account", true); ?></h5>
+    <div class="d-flex gap-2">
+        <!-- Sync button -->
+        <?php $this->Form->create(); ?>
+        <input type="hidden" name="action" value="sync">
+        <button type="submit" class="btn btn-sm btn-outline-secondary">
+            <?php $this->Html->_("TwentyiHosting.tab_account.sync_btn", true); ?>
+        </button>
+        <?php $this->Form->end(); ?>
+
+        <!-- Admin SSO button (POST → server-side redirect) -->
+        <?php if (!empty($ssoUrl)) : ?>
+            <?php $this->Form->create(['action' => $ssoUrl, 'target' => '_blank']); ?>
+            <button type="submit" class="btn btn-sm btn-primary">
+                <?php $this->Html->_("TwentyiHosting.tab_account.admin_sso_btn", true); ?>
+            </button>
+            <?php $this->Form->end(); ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.domain", true); ?></th>
+            <td><?php echo $this->Html->safe($fields->twentyi_domain ?? '—'); ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.package_id", true); ?></th>
+            <td><?php echo $this->Html->safe($fields->twentyi_package_id ?? '—'); ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.package_type", true); ?></th>
+            <td><?php echo $this->Html->safe($fields->twentyi_package_type ?? '—'); ?></td>
+        </tr>
+        <?php if ($packageData !== null) : ?>
+            <tr>
+                <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.status", true); ?></th>
+                <td>
+                    <?php
+                    $enabled = $packageData->enabled ?? $packageData->status ?? null;
+                    if ($enabled === true || $enabled === 'active') {
+                        echo '<span class="badge bg-success">Active</span>';
+                    } elseif ($enabled === false || $enabled === 'suspended') {
+                        echo '<span class="badge bg-warning text-dark">Suspended</span>';
+                    } else {
+                        echo $this->Html->safe((string) $enabled);
+                    }
+                    ?>
+                </td>
+            </tr>
+            <?php if (!empty($packageData->diskUsage)) : ?>
+                <tr>
+                    <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.disk_usage", true); ?></th>
+                    <td><?php echo $this->Html->safe((string) $packageData->diskUsage); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if (!empty($packageData->bandwidthUsage)) : ?>
+                <tr>
+                    <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.bandwidth_usage", true); ?></th>
+                    <td><?php echo $this->Html->safe((string) $packageData->bandwidthUsage); ?></td>
+                </tr>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <!-- SSL status (shown only if data returned by API) -->
+        <?php if ($sslData !== null) : ?>
+            <tr>
+                <th scope="row"><?php $this->Html->_("TwentyiHosting.tab_account.ssl_status", true); ?></th>
+                <td>
+                    <?php
+                    $sslStatus = $sslData->status ?? null;
+                    if ($sslStatus === 'valid' || $sslStatus === 'active') {
+                        echo '<span class="badge bg-success">' . $this->Html->_('TwentyiHosting.tab_account.ssl_valid', true) . '</span>';
+                    } elseif ($sslStatus === 'pending') {
+                        echo '<span class="badge bg-info">' . $this->Html->_('TwentyiHosting.tab_account.ssl_pending', true) . '</span>';
+                    } elseif ($sslStatus !== null) {
+                        echo '<span class="badge bg-danger">' . $this->Html->_('TwentyiHosting.tab_account.ssl_invalid', true) . '</span>';
+                    }
+                    if (!empty($sslData->expiry)) {
+                        echo ' <small class="text-muted">' . $this->Html->_('TwentyiHosting.tab_account.ssl_expiry', true) . ': ' . $this->Html->safe($sslData->expiry) . '</small>';
+                    }
+                    ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>

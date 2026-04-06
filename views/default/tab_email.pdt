@@ -1,0 +1,112 @@
+<?php
+/**
+ * Admin/Client: Email Accounts tab
+ *
+ * @var $fields    object
+ * @var $accounts  array
+ * @var $domain    string
+ * @var $post      array
+ * @var $notice    string|null
+ * @var $apiError  string|null
+ * @var $no_package_id bool|null
+ */
+?>
+
+<?php if (!empty($no_package_id)) : ?>
+    <div class="alert alert-warning"><?php $this->Html->_("TwentyiHosting.tab_account.no_package_id", true); ?></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<?php if (!empty($notice)) : ?>
+    <div class="alert alert-success"><?php echo $this->Html->safe($notice); ?></div>
+<?php endif; ?>
+
+<?php if (!empty($apiError)) : ?>
+    <div class="alert alert-danger"><?php echo $this->Html->safe($apiError); ?></div>
+<?php endif; ?>
+
+<h5><?php $this->Html->_("TwentyiHosting.tab_email.title", true); ?></h5>
+
+<?php if (empty($accounts)) : ?>
+    <p class="text-muted"><?php $this->Html->_("TwentyiHosting.tab_email.no_accounts", true); ?></p>
+<?php else : ?>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th><?php $this->Html->_("TwentyiHosting.tab_email.address", true); ?></th>
+                <?php if (!empty($accounts[0]->passwordChangedAt ?? null)) : ?>
+                    <th><?php $this->Html->_("TwentyiHosting.tab_email.last_changed", true); ?></th>
+                <?php endif; ?>
+                <th><?php $this->Html->_("TwentyiHosting.tab_email.actions", true); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($accounts as $account) :
+                $local = $account->local ?? $account->username ?? '';
+                $email = $local . '@' . $domain;
+            ?>
+                <tr>
+                    <td><?php echo $this->Html->safe($email); ?></td>
+                    <?php if (isset($account->passwordChangedAt)) : ?>
+                        <td><?php echo $this->Html->safe((string) $account->passwordChangedAt); ?></td>
+                    <?php endif; ?>
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <!-- Change password inline form -->
+                            <?php $this->Form->create(['class' => 'd-flex gap-1 align-items-center']); ?>
+                            <input type="hidden" name="action" value="change_password">
+                            <input type="hidden" name="local" value="<?php echo $this->Html->safe($local); ?>">
+                            <input type="password"
+                                   class="form-control form-control-sm"
+                                   name="new_password"
+                                   placeholder="<?php $this->Html->_('TwentyiHosting.tab_email.new_password', true); ?>"
+                                   style="width:160px;"
+                                   autocomplete="new-password">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                <?php $this->Html->_("TwentyiHosting.tab_email.save_password", true); ?>
+                            </button>
+                            <?php $this->Form->end(); ?>
+
+                            <!-- Delete -->
+                            <?php $this->Form->create(); ?>
+                            <input type="hidden" name="action" value="delete_account">
+                            <input type="hidden" name="local" value="<?php echo $this->Html->safe($local); ?>">
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Delete <?php echo $this->Html->safe($email); ?>?');">
+                                <?php $this->Html->_("TwentyiHosting.tab_email.delete_btn", true); ?>
+                            </button>
+                            <?php $this->Form->end(); ?>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+
+<hr>
+<h6><?php $this->Html->_("TwentyiHosting.tab_email.add_account", true); ?></h6>
+<?php $this->Form->create(); ?>
+<input type="hidden" name="action" value="create_account">
+<div class="row g-2 align-items-end">
+    <div class="col-sm-4">
+        <label class="form-label" for="email_local"><?php $this->Html->_("TwentyiHosting.tab_email.local", true); ?></label>
+        <div class="input-group input-group-sm">
+            <input type="text" class="form-control" id="email_local" name="local"
+                   value="<?php echo $this->Html->safe($post['local'] ?? ''); ?>"
+                   placeholder="username">
+            <span class="input-group-text">@<?php echo $this->Html->safe($domain); ?></span>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <label class="form-label" for="email_password"><?php $this->Html->_("TwentyiHosting.tab_email.password", true); ?></label>
+        <input type="password" class="form-control form-control-sm" id="email_password" name="password"
+               autocomplete="new-password">
+    </div>
+    <div class="col-sm-2">
+        <button type="submit" class="btn btn-sm btn-primary">
+            <?php $this->Html->_("TwentyiHosting.tab_email.create_btn", true); ?>
+        </button>
+    </div>
+</div>
+<?php $this->Form->end(); ?>
