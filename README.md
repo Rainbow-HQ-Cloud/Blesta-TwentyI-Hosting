@@ -28,7 +28,7 @@ An open source Blesta server provisioning module that integrates with the [20i R
 ## Requirements
 
 | Requirement | Version |
-|-------------|---------|
+| ----------- | ------- |
 | Blesta | 5.x (v6 compatible by design) |
 | PHP | 8.1 or higher |
 | Composer | 2.x |
