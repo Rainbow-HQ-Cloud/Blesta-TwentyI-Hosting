@@ -1,0 +1,88 @@
+name: Release
+
+# Triggers when a version tag is pushed (e.g. v1.0.0, v1.2.3-rc1).
+# The resulting zip is attached to a GitHub Release so end users can
+# download it and drop it straight into their Blesta modules directory.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # Required to create a GitHub Release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: curl, json, mbstring
+          coverage: none
+
+      - name: Install production dependencies
+        # --no-dev omits phpunit / phpstan / phpcs — only the 20i SDK is bundled.
+        # --optimize-autoloader generates a class-map so the autoloader is faster
+        # in production and doesn't rely on PSR-4 filesystem scanning.
+        run: |
+          composer install \
+            --no-dev \
+            --prefer-dist \
+            --no-interaction \
+            --no-progress \
+            --optimize-autoloader
+
+      - name: Build release package
+        id: package
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          ARCHIVE="twentyi_hosting-${VERSION}.zip"
+
+          # Stage files under twentyi_hosting/ so that extracting the zip
+          # produces exactly the folder Blesta expects in components/modules/.
+          STAGING="$(mktemp -d)/twentyi_hosting"
+          mkdir -p "${STAGING}"
+
+          cp  twentyi_hosting.php  "${STAGING}/"
+          cp  config.json          "${STAGING}/"
+          cp  LICENSE              "${STAGING}/"
+          cp -r apis               "${STAGING}/"
+          cp -r language           "${STAGING}/"
+          cp -r views              "${STAGING}/"
+          cp -r vendor             "${STAGING}/"
+
+          # Zip with the parent directory so the archive root is twentyi_hosting/
+          (cd "$(dirname "${STAGING}")" && zip -qr "${ARCHIVE}" twentyi_hosting/)
+          mv "$(dirname "${STAGING}")/${ARCHIVE}" .
+
+          echo "archive=${ARCHIVE}" >> "${GITHUB_OUTPUT}"
+          echo "version=${VERSION}"  >> "${GITHUB_OUTPUT}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "${{ steps.package.outputs.version }}"
+          body: |
+            ## Installation
+
+            1. Download **`${{ steps.package.outputs.archive }}`** below.
+            2. Extract the zip — it contains a single `twentyi_hosting/` folder.
+            3. Copy that folder to `BLESTA_ROOT/components/modules/twentyi_hosting/`.
+            4. In Blesta: **Admin → Modules → Available Modules** → install **20i Hosting**.
+
+            All Composer dependencies (the 20i Reseller API SDK) are bundled inside
+            the zip — no `composer install` step is required on your server.
+
+            ## Changelog
+
+            _Edit this release on GitHub to add release notes._
+          files: ${{ steps.package.outputs.archive }}
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          draft: false
