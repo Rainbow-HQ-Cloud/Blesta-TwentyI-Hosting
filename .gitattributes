@@ -1,0 +1,13 @@
+# Normalize line endings to LF for all text files.
+# This ensures PHPCS (which expects LF) passes on Linux CI even when
+# files are authored on Windows.
+* text=auto eol=lf
+
+# Binary files — no conversion
+*.png binary
+*.jpg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.zip binary
+*.gz  binary

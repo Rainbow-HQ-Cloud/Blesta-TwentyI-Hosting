@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ruleset name="Blesta TwentyI Module">
+    <description>PSR-12 with exclusions for Blesta framework constraints</description>
+
+    <!--
+        Blesta modules are loaded directly by the framework and cannot use PHP
+        namespaces. The namespace sniffs must be excluded.
+    -->
+
+    <!-- Files to scan (language files contain long translation strings; skip them) -->
+    <file>twentyi_hosting.php</file>
+    <file>apis</file>
+    <file>tests</file>
+
+    <!-- Dev-only stubs for static analysis — not production code -->
+    <exclude-pattern>phpstan-bootstrap.php</exclude-pattern>
+    <exclude-pattern>vendor/*</exclude-pattern>
+
+    <rule ref="PSR12">
+        <!--
+            Blesta modules must be globally scoped — namespaces are not
+            supported by the framework's module loader.
+        -->
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+
+        <!--
+            PHPUnit test method names use snake_case suffixes (e.g.
+            testMethod_doesSomething) — this is common PHPUnit convention
+            and does not affect runtime behaviour.
+        -->
+        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
+    </rule>
+</ruleset>

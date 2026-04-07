@@ -116,24 +116,27 @@ class TwentyiHosting extends Module
     // Module row management (API credentials)
     // -------------------------------------------------------------------------
 
+    /** @param array<string,mixed> $vars */
     public function manageModule(mixed $module, array &$vars): string
     {
-        $view = $this->makeView('manage', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view = $this->makeView('manage', 'default', $this->viewsDir());
         $this->view = $view;
         $this->view->set('module', $module);
         return $this->view->fetch();
     }
 
+    /** @param array<string,mixed> $vars */
     public function manageAddRow(array &$vars): string
     {
-        $this->view = $this->makeView('add_row', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $this->view = $this->makeView('add_row', 'default', $this->viewsDir());
         $this->view->set('vars', (object) $vars);
         return $this->view->fetch();
     }
 
+    /** @param array<string,mixed> $vars */
     public function manageEditRow(mixed $module_row, array &$vars): string
     {
-        $this->view = $this->makeView('edit_row', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $this->view = $this->makeView('edit_row', 'default', $this->viewsDir());
         if (empty($vars)) {
             $vars = (array) $module_row->meta;
         }
@@ -349,12 +352,14 @@ class TwentyiHosting extends Module
         $fields = new ModuleFields();
 
         // Domain name
+        $placeholder = Language::_('TwentyiHosting.service_fields.domain_placeholder', true);
         $domainField = $fields->fieldText(
             'twentyi_domain',
             $vars->twentyi_domain ?? '',
-            ['id' => 'twentyi_domain', 'class' => 'form-control', 'placeholder' => Language::_('TwentyiHosting.service_fields.domain_placeholder', true)]
+            ['id' => 'twentyi_domain', 'class' => 'form-control', 'placeholder' => $placeholder]
         );
-        $domainField->attach($fields->label(Language::_('TwentyiHosting.service_fields.domain', true), 'twentyi_domain'));
+        $domainLabel = Language::_('TwentyiHosting.service_fields.domain', true);
+        $domainField->attach($fields->label($domainLabel, 'twentyi_domain'));
         $fields->setField($domainField);
 
         // Domain action (new or existing) — only on add, not edit
@@ -368,7 +373,8 @@ class TwentyiHosting extends Module
                 $vars->twentyi_domain_action ?? 'use_existing',
                 ['id' => 'twentyi_domain_action', 'class' => 'form-select']
             );
-            $actionField->attach($fields->label(Language::_('TwentyiHosting.service_fields.domain_action', true), 'twentyi_domain_action'));
+            $actionLabel = Language::_('TwentyiHosting.service_fields.domain_action', true);
+            $actionField->attach($fields->label($actionLabel, 'twentyi_domain_action'));
             $fields->setField($actionField);
         }
 
@@ -379,7 +385,8 @@ class TwentyiHosting extends Module
                 $vars->twentyi_package_id ?? '',
                 ['id' => 'twentyi_package_id', 'class' => 'form-control']
             );
-            $pkgField->attach($fields->label(Language::_('TwentyiHosting.service_fields.package_id', true), 'twentyi_package_id'));
+            $pkgLabel = Language::_('TwentyiHosting.service_fields.package_id', true);
+            $pkgField->attach($fields->label($pkgLabel, 'twentyi_package_id'));
             $fields->setField($pkgField);
         }
 
@@ -405,7 +412,8 @@ class TwentyiHosting extends Module
     ): array {
         $row = $this->getModuleRow();
         if (!$row) {
-            $this->Input->setErrors(['module_row' => ['missing' => Language::_('TwentyiHosting.!error.module_row_missing', true)]]);
+            $msg = Language::_('TwentyiHosting.!error.module_row_missing', true);
+            $this->Input->setErrors(['module_row' => ['missing' => $msg]]);
             return [];
         }
 
@@ -495,6 +503,8 @@ class TwentyiHosting extends Module
 
     /**
      * Suspend a hosting package.
+     *
+     * @return array<mixed>|null
      */
     public function suspendService(
         mixed $package,
@@ -514,7 +524,8 @@ class TwentyiHosting extends Module
                     $this->log("suspend|{$packageId}", serialize($response), 'output', true);
                 } catch (\RuntimeException $e) {
                     $this->log("suspend|{$packageId}", $e->getMessage(), 'output', false);
-                    $this->Input->setErrors(['api' => ['error' => Language::_('TwentyiHosting.!error.api_error', true)]]);
+                    $apiErr = Language::_('TwentyiHosting.!error.api_error', true);
+                    $this->Input->setErrors(['api' => ['error' => $apiErr]]);
                 }
             }
         }
@@ -523,6 +534,8 @@ class TwentyiHosting extends Module
 
     /**
      * Unsuspend (re-enable) a hosting package.
+     *
+     * @return array<mixed>|null
      */
     public function unsuspendService(
         mixed $package,
@@ -542,7 +555,8 @@ class TwentyiHosting extends Module
                     $this->log("unsuspend|{$packageId}", serialize($response), 'output', true);
                 } catch (\RuntimeException $e) {
                     $this->log("unsuspend|{$packageId}", $e->getMessage(), 'output', false);
-                    $this->Input->setErrors(['api' => ['error' => Language::_('TwentyiHosting.!error.api_error', true)]]);
+                    $apiErr = Language::_('TwentyiHosting.!error.api_error', true);
+                    $this->Input->setErrors(['api' => ['error' => $apiErr]]);
                 }
             }
         }
@@ -551,6 +565,8 @@ class TwentyiHosting extends Module
 
     /**
      * Terminate (delete) a hosting package.
+     *
+     * @return array<mixed>|null
      */
     public function cancelService(
         mixed $package,
@@ -570,7 +586,8 @@ class TwentyiHosting extends Module
                     $this->log("delete|{$packageId}", serialize($response), 'output', true);
                 } catch (\RuntimeException $e) {
                     $this->log("delete|{$packageId}", $e->getMessage(), 'output', false);
-                    $this->Input->setErrors(['api' => ['error' => Language::_('TwentyiHosting.!error.api_error', true)]]);
+                    $apiErr = Language::_('TwentyiHosting.!error.api_error', true);
+                    $this->Input->setErrors(['api' => ['error' => $apiErr]]);
                 }
             }
         }
@@ -718,7 +735,7 @@ class TwentyiHosting extends Module
     {
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
-        $view      = $this->makeView('tab_account', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView('tab_account', 'default', $this->viewsDir());
 
         if ($packageId === '') {
             $view->set('no_package_id', true);
@@ -761,17 +778,14 @@ class TwentyiHosting extends Module
             }
         }
 
-        $view->set('fields',      $fields);
+        $view->set('fields', $fields);
         $view->set('packageData', $packageData);
-        $view->set('sslData',     $sslData);
-        $view->set('ssoUrl',      $ssoUrl);
-        $view->set('apiError',    $apiError);
+        $view->set('sslData', $sslData);
+        $view->set('ssoUrl', $ssoUrl);
+        $view->set('apiError', $apiError);
         return $view->fetch();
     }
 
-    /**
-     * @param array<string,mixed> $fields
-     */
     private function handleAccountPost(string $action, string $packageId, object $fields): void
     {
         if ($action !== 'sync') {
@@ -793,7 +807,7 @@ class TwentyiHosting extends Module
     {
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
-        $view      = $this->makeView('tab_raw_api', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView('tab_raw_api', 'default', $this->viewsDir());
 
         $rawData  = null;
         $apiError = null;
@@ -807,7 +821,7 @@ class TwentyiHosting extends Module
             }
         }
 
-        $view->set('rawData',  $rawData !== null ? json_encode($rawData, JSON_PRETTY_PRINT) : null);
+        $view->set('rawData', $rawData !== null ? json_encode($rawData, JSON_PRETTY_PRINT) : null);
         $view->set('apiError', $apiError);
         return $view->fetch();
     }
@@ -859,7 +873,7 @@ class TwentyiHosting extends Module
     {
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
-        $view      = $this->makeView('tab_cache', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView('tab_cache', 'default', $this->viewsDir());
 
         $notice   = null;
         $apiError = null;
@@ -878,9 +892,9 @@ class TwentyiHosting extends Module
             }
         }
 
-        $view->set('fields',    $fields);
-        $view->set('notice',    $notice);
-        $view->set('apiError',  $apiError);
+        $view->set('fields', $fields);
+        $view->set('notice', $notice);
+        $view->set('apiError', $apiError);
         return $view->fetch();
     }
 
@@ -921,7 +935,7 @@ class TwentyiHosting extends Module
     {
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
-        $view      = $this->makeView('tab_client_account', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView('tab_client_account', 'default', $this->viewsDir());
 
         if ($packageId === '') {
             $view->set('no_package_id', true);
@@ -963,10 +977,10 @@ class TwentyiHosting extends Module
             }
         }
 
-        $view->set('fields',      $fields);
+        $view->set('fields', $fields);
         $view->set('packageData', $packageData);
-        $view->set('sslData',     $sslData);
-        $view->set('apiError',    $apiError);
+        $view->set('sslData', $sslData);
+        $view->set('apiError', $apiError);
         return $view->fetch();
     }
 
@@ -1032,7 +1046,7 @@ class TwentyiHosting extends Module
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
         $domain    = $fields->twentyi_domain ?? '';
-        $view      = $this->makeView($isAdmin ? 'tab_dns' : 'tab_client_dns', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView($isAdmin ? 'tab_dns' : 'tab_client_dns', 'default', $this->viewsDir());
 
         $notice   = null;
         $apiError = null;
@@ -1105,10 +1119,10 @@ class TwentyiHosting extends Module
             $this->log("getDns|{$packageId}", $e->getMessage(), 'output', false);
         }
 
-        $view->set('fields',   $fields);
-        $view->set('records',  $records);
-        $view->set('post',     $post);
-        $view->set('notice',   $notice);
+        $view->set('fields', $fields);
+        $view->set('records', $records);
+        $view->set('post', $post);
+        $view->set('notice', $notice);
         $view->set('apiError', $apiError);
         return $view->fetch();
     }
@@ -1142,7 +1156,7 @@ class TwentyiHosting extends Module
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
         $domain    = $fields->twentyi_domain ?? '';
-        $view      = $this->makeView($isAdmin ? 'tab_email' : 'tab_client_email', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView($isAdmin ? 'tab_email' : 'tab_client_email', 'default', $this->viewsDir());
 
         $notice   = null;
         $apiError = null;
@@ -1226,11 +1240,11 @@ class TwentyiHosting extends Module
             $this->log("getEmail|{$packageId}", $e->getMessage(), 'output', false);
         }
 
-        $view->set('fields',   $fields);
+        $view->set('fields', $fields);
         $view->set('accounts', $accounts);
-        $view->set('domain',   $domain);
-        $view->set('post',     $post);
-        $view->set('notice',   $notice);
+        $view->set('domain', $domain);
+        $view->set('post', $post);
+        $view->set('notice', $notice);
         $view->set('apiError', $apiError);
         return $view->fetch();
     }
@@ -1257,7 +1271,7 @@ class TwentyiHosting extends Module
     {
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
-        $view      = $this->makeView($isAdmin ? 'tab_ftp' : 'tab_client_ftp', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView($isAdmin ? 'tab_ftp' : 'tab_client_ftp', 'default', $this->viewsDir());
 
         $notice    = null;
         $apiError  = null;
@@ -1284,7 +1298,8 @@ class TwentyiHosting extends Module
                     try {
                         $response = $api->setFtpLock($packageId, $locked);
                         $this->log("ftpLock|{$packageId}", serialize($response), 'output', true);
-                        $notice = Language::_($locked ? 'TwentyiHosting.notice.ftp_lock_on' : 'TwentyiHosting.notice.ftp_lock_off', true);
+                        $key = $locked ? 'TwentyiHosting.notice.ftp_lock_on' : 'TwentyiHosting.notice.ftp_lock_off';
+                        $notice = Language::_($key, true);
                     } catch (\RuntimeException $e) {
                         $this->log("ftpLock|{$packageId}", $e->getMessage(), 'output', false);
                         $apiError = Language::_('TwentyiHosting.!error.api_error', true);
@@ -1294,7 +1309,8 @@ class TwentyiHosting extends Module
                 case 'reset_password':
                     $password = (string) ($post['ftp_password'] ?? '');
                     if (strlen($password) < 8 || !preg_match('/[0-9]/', $password)) {
-                        $this->Input->setErrors(['ftp_password' => ['valid' => Language::_('TwentyiHosting.!error.ftp_password_valid', true)]]);
+                        $ftpErr = Language::_('TwentyiHosting.!error.ftp_password_valid', true);
+                        $this->Input->setErrors(['ftp_password' => ['valid' => $ftpErr]]);
                     } else {
                         $this->log("ftpReset|{$packageId}", '[REDACTED]', 'input', true);
                         try {
@@ -1317,11 +1333,11 @@ class TwentyiHosting extends Module
             $this->log("getFtp|{$packageId}", $e->getMessage(), 'output', false);
         }
 
-        $view->set('fields',    $fields);
+        $view->set('fields', $fields);
         $view->set('ftpStatus', $ftpStatus);
-        $view->set('post',      $post);
-        $view->set('notice',    $notice);
-        $view->set('apiError',  $apiError);
+        $view->set('post', $post);
+        $view->set('notice', $notice);
+        $view->set('apiError', $apiError);
         return $view->fetch();
     }
 
@@ -1332,7 +1348,7 @@ class TwentyiHosting extends Module
     {
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
-        $view      = $this->makeView($isAdmin ? 'tab_domains' : 'tab_client_domains', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $view      = $this->makeView($isAdmin ? 'tab_domains' : 'tab_client_domains', 'default', $this->viewsDir());
 
         $notice   = null;
         $apiError = null;
@@ -1356,7 +1372,8 @@ class TwentyiHosting extends Module
                 case 'add_domain':
                     $addonDomain = strtolower(trim((string) ($post['addon_domain'] ?? '')));
                     if (!$this->validateDomain($addonDomain)) {
-                        $this->Input->setErrors(['addon_domain' => ['valid' => Language::_('TwentyiHosting.!error.addon_domain_valid', true)]]);
+                        $addonErr = Language::_('TwentyiHosting.!error.addon_domain_valid', true);
+                        $this->Input->setErrors(['addon_domain' => ['valid' => $addonErr]]);
                     } else {
                         $this->log("addAddon|{$packageId}", "domain={$addonDomain}", 'input', true);
                         try {
@@ -1396,10 +1413,10 @@ class TwentyiHosting extends Module
             $this->log("getPackage|{$packageId}", $e->getMessage(), 'output', false);
         }
 
-        $view->set('fields',   $fields);
-        $view->set('domains',  $domains);
-        $view->set('post',     $post);
-        $view->set('notice',   $notice);
+        $view->set('fields', $fields);
+        $view->set('domains', $domains);
+        $view->set('post', $post);
+        $view->set('notice', $notice);
         $view->set('apiError', $apiError);
         return $view->fetch();
     }
@@ -1412,7 +1429,8 @@ class TwentyiHosting extends Module
         $fields    = $this->serviceFieldsToVars($service->fields ?? []);
         $packageId = $fields->twentyi_package_id ?? '';
         $domain    = $fields->twentyi_domain ?? '';
-        $view      = $this->makeView($isAdmin ? 'tab_nameservers' : 'tab_client_nameservers', 'default', ROOTWEBDIR . implode(DS, ['components', 'modules', 'twentyi_hosting', '']));
+        $viewName  = $isAdmin ? 'tab_nameservers' : 'tab_client_nameservers';
+        $view      = $this->makeView($viewName, 'default', $this->viewsDir());
 
         // Nameserver management is only relevant for domains registered via 20i.
         if (($fields->twentyi_domain_action ?? 'use_existing') !== 'register_new') {
@@ -1467,11 +1485,11 @@ class TwentyiHosting extends Module
             $this->log("getNs|{$domain}", $e->getMessage(), 'output', false);
         }
 
-        $view->set('fields',      $fields);
+        $view->set('fields', $fields);
         $view->set('nameservers', $nameservers);
-        $view->set('post',        $post);
-        $view->set('notice',      $notice);
-        $view->set('apiError',    $apiError);
+        $view->set('post', $post);
+        $view->set('notice', $notice);
+        $view->set('apiError', $apiError);
         return $view->fetch();
     }
 
@@ -1553,8 +1571,10 @@ class TwentyiHosting extends Module
 
         // Build a human-readable summary of every affected service.
         $lines   = [];
-        $lines[] = "WARNING: {$count} active/suspended service(s) were still linked to this module at the time of uninstallation.";
-        $lines[] = "These hosting accounts remain active in your hosting provider dashboard and must be managed manually.";
+        $lines[] = "WARNING: {$count} active/suspended service(s) were still linked to this module"
+            . " at the time of uninstallation.";
+        $lines[] = "These hosting accounts remain active in your hosting provider dashboard"
+            . " and must be managed manually.";
         $lines[] = "Record the following details before they are lost:";
         $lines[] = str_repeat('-', 60);
 
@@ -1605,6 +1625,16 @@ class TwentyiHosting extends Module
     {
         $apiKey = $row->meta->api_key ?? '';
         return new TwentyIApi($apiKey);
+    }
+
+    /**
+     * Return the filesystem path to this module's views directory.
+     *
+     * Extracted to avoid repeating a long expression on every makeView() call.
+     */
+    private function viewsDir(): string
+    {
+        return $this->viewsDir();
     }
 
     /**

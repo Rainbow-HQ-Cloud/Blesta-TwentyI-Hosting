@@ -246,7 +246,9 @@ class TwentyIApiTest extends TestCase
     public function testCreateEmailAccount_wrapsPayloadCorrectly(): void
     {
         $data = ['local' => 'info', 'password' => 'Secure123'];
-        $expectedPayload = ['new' => ['mailbox' => ['send' => true, 'receive' => true, 'local' => 'info', 'password' => 'Secure123']]];
+        $expectedPayload = ['new' => ['mailbox' => [
+            'send' => true, 'receive' => true, 'local' => 'info', 'password' => 'Secure123',
+        ]]];
 
         $this->servicesMock
             ->expects($this->once())

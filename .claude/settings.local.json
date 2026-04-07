@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:packagist.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh run:*)",
+      "Bash(php --version)",
+      "Bash(/c/Users/MarkusSimpson/.config/herd/bin/php84/php.exe vendor/bin/phpcs)",
+      "Bash(/c/Users/MarkusSimpson/.config/herd/bin/php84/php.exe vendor/bin/phpstan analyse --no-progress)",
+      "Bash(/c/Users/MarkusSimpson/.config/herd/bin/php84/php.exe vendor/bin/phpunit --testdox)"
     ]
   }
 }

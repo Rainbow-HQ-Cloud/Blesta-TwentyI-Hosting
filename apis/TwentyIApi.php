@@ -308,7 +308,7 @@ class TwentyIApi
     public function getSsoToken(string $packageId): string
     {
         try {
-            $token = $this->auth->controlPanelTokenForUser($packageId);
+            $response = $this->auth->controlPanelTokenForUser($packageId);
         } catch (\Throwable $e) {
             throw new \RuntimeException(
                 "20i SSO token generation failed: " . $e->getMessage(),
@@ -316,6 +316,8 @@ class TwentyIApi
                 $e
             );
         }
+
+        $token = $response['access_token'] ?? null;
 
         if (empty($token)) {
             throw new \RuntimeException('20i API returned an empty SSO token.');

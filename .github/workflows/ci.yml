@@ -42,7 +42,7 @@ jobs:
         run: vendor/bin/phpunit --testdox
 
       - name: Run PHP_CodeSniffer (PSR-12)
-        run: vendor/bin/phpcs --standard=PSR12 --extensions=php --ignore=vendor/ .
+        run: vendor/bin/phpcs
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse --no-progress

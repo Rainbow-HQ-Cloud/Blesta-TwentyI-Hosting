@@ -5,7 +5,5 @@ parameters:
         - apis
     excludePaths:
         - vendor
-    ignoreErrors:
-        # Blesta core classes are not available during static analysis
-        - '#Class (Module|ModuleFields|Language|Loader) not found#'
-        - '#Call to method .* of unknown class (Module|ModuleFields|Language|Loader)#'
+    bootstrapFiles:
+        - phpstan-bootstrap.php
