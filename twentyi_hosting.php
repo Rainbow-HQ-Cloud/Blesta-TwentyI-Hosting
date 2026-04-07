@@ -9,7 +9,7 @@ declare(strict_types=1);
  * packages via the 20i Reseller API.
  *
  * @license MIT
- * @link    https://github.com/blesta/twentyi-hosting
+ * @link    https://github.com/Rainbow-HQ-Cloud/Blesta-TwentyI-Hosting
  */
 class TwentyiHosting extends Module
 {
@@ -58,7 +58,7 @@ class TwentyiHosting extends Module
      */
     public function getAuthors(): array
     {
-        return [['name' => 'Markus Simpson', 'url' => 'https://github.com/markus-blesta-twentyi']];
+        return [['name' => 'Rainbow HQ', 'url' => 'https://github.com/Rainbow-HQ-Cloud/Blesta-TwentyI-Hosting']];
     }
 
     public function moduleRowName(): string

@@ -5,8 +5,8 @@
     "type": "blesta-module",
     "authors": [
         {
-            "name": "Markus Simpson",
-            "homepage": "https://github.com/markus-blesta-twentyi"
+            "name": "Rainbow HQ",
+            "homepage": "https://github.com/Rainbow-HQ-Cloud/Blesta-TwentyI-Hosting"
         }
     ],
     "require": {

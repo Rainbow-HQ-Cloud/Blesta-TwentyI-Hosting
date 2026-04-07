@@ -42,7 +42,7 @@ An open source Blesta server provisioning module that integrates with the [20i R
 
 ```bash
 cd /path/to/blesta/components/modules/
-git clone https://github.com/your-username/blesta-twentyi-hosting twentyi_hosting
+git clone https://github.com/Rainbow-HQ-Cloud/Blesta-TwentyI-Hosting twentyi_hosting
 ```
 
 Or download the zip and extract it as `components/modules/twentyi_hosting/`.
