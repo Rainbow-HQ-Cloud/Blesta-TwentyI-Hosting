@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 80" width="220" height="80">
+  <!-- Background -->
+  <rect width="220" height="80" rx="8" fill="#0f1929"/>
+  <!-- Green top accent bar -->
+  <rect width="220" height="4" rx="2" fill="#00C896"/>
+
+  <!-- "20i" wordmark -->
+  <text x="16" y="58"
+        font-family="'Arial Black', 'Arial Bold', Arial, sans-serif"
+        font-size="42"
+        font-weight="900"
+        fill="#ffffff">20i</text>
+
+  <!-- Vertical divider -->
+  <line x1="124" y1="18" x2="124" y2="64" stroke="#2a3f55" stroke-width="1.5"/>
+
+  <!-- Right-side labels -->
+  <text x="134" y="43"
+        font-family="Arial, sans-serif"
+        font-size="13"
+        font-weight="700"
+        fill="#00C896">Hosting</text>
+  <text x="134" y="60"
+        font-family="Arial, sans-serif"
+        font-size="11"
+        fill="#6b8096">for Blesta</text>
+</svg>

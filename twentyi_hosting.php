@@ -53,6 +53,11 @@ class TwentyiHosting extends Module
         return '1.0.0';
     }
 
+    public function getLogo(): string
+    {
+        return 'views' . DS . 'default' . DS . 'images' . DS . 'logo.svg';
+    }
+
     /**
      * @return array<int,array{name:string,url:string}>
      */
